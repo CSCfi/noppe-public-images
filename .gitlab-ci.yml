@@ -17,6 +17,7 @@ variables:
     options:
       - ''
       - jupyter-datascience
+      - jupyter-geospatial
       - jupyter-machine-learning
       - jupyter-minimal
       - jupyter-pyspark
@@ -37,6 +38,7 @@ variables:
     options:
       - ''
       - jupyter-datascience
+      - jupyter-geospatial
       - jupyter-machine-learning
       - jupyter-minimal
       - jupyter-pyspark
@@ -93,6 +95,13 @@ stages:
 build-jupyter-datascience-image:
   variables:
     COMPONENT: jupyter-datascience
+  <<: *job_definition
+
+build-jupyter-geospatial-image:
+  variables:
+    COMPONENT: jupyter-geospatial
+    KUBERNETES_MEMORY_REQUEST: "6Gi"
+    KUBERNETES_MEMORY_LIMIT: "6Gi"
   <<: *job_definition
 
 build-jupyter-machine-learning-image:
