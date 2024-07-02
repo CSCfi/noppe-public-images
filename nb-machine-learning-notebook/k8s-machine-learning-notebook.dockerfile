@@ -1,6 +1,6 @@
-FROM jupyter/minimal-notebook:2022-11-14
+FROM quay.io/jupyter/minimal-notebook:notebook-7.1.3
 
-LABEL org.opencontainers.image.authors="CSC Notebooks Team <notebooks-admin@csc.fi>"
+LABEL org.opencontainers.image.authors="Noppe Team <notebooks-admin@csc.fi>"
 
 USER root
 
@@ -16,6 +16,11 @@ RUN echo "graphviz from apt" \
     && apt-get install -y graphviz \
     && apt-get clean
 
+RUN echo "g++ from apt" \
+    && apt-get update \
+    && apt-get install -y g++ \
+    && apt-get clean
+
 USER $NB_USER
 
 RUN echo "upgrade pip and setuptools" \
@@ -24,13 +29,16 @@ RUN echo "upgrade pip and setuptools" \
 RUN echo "Tensorflow" \
     && pip --no-cache-dir install tensorflow
 
+RUN echo "PyStan" \
+    && pip --no-cache-dir install pystan
+
 RUN echo "Scikit-Learn" \
     && pip --no-cache-dir install scikit-learn
 
 RUN echo "PyTorch, TorchVision and ipywidgets" \
     && pip --no-cache-dir install torch torchvision torchaudio torchtext \
        --extra-index-url https://download.pytorch.org/whl/cpu \
-    && pip --no-cache-dir install ipywidgets==7.5.1
+    && pip --no-cache-dir install ipywidgets==8.1.3
 
 RUN echo "Xgboost" \
     && pip --no-cache-dir install xgboost
@@ -52,3 +60,5 @@ RUN echo "MNIST image database prepopulation" \
 RUN echo "pydot and pydot-ng" \
     && pip --no-cache-dir install pydot pydot-ng\
     && true
+
+RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
