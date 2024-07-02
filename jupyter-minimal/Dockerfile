@@ -7,9 +7,9 @@ USER root
 ENV HOME /home/$NB_USER
 
 RUN echo "ssh-client and less from apt" \
-    && apt-get update -y \
+    && apt-get update \
     && apt-get install -y ssh-client less \
-    && apt-get clean -y
+    && apt-get clean \
 
 RUN echo "g++ from apt" \
     && apt-get update \

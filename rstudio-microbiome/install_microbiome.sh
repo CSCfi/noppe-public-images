@@ -41,7 +41,8 @@ apt-get update -qq \
     git \
     whois \
     libmagick++-dev \
-    gdebi-core
+    gdebi-core \
+&& apt-get clean
 
 echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh
 wget https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh  -O ~/anaconda.sh

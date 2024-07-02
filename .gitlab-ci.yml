@@ -1,57 +1,148 @@
 ---
-image: docker:git
+variables:
+  KUBERNETES_MEMORY_REQUEST: "2Gi"
+  KUBERNETES_MEMORY_LIMIT: "2Gi"
+  REGISTRY_AUTH_FILE: /run/secrets/runner-job-secrets/docker_config_ci.json
+
+  # Parameters for running the builds manually
+  BUILD_ALL_IMAGES:
+    description: 'Build all images regardless of changes'
+    value: 'false'
+    options:
+      - 'false'
+      - 'true'
+  BUILD_SINGLE_IMAGE:
+    description: 'Build a single image regardless of changes'
+    value: ''
+    options:
+      - ''
+      - jupyter-datascience
+      - jupyter-machine-learning
+      - jupyter-minimal
+      - jupyter-pyspark
+      - rstudio-geospatial
+      - rstudio-microbiome
+      - rstudio-ngs
+      - rstudio-scrna
+      - rstudio-teaching
 
 stages:
-  - build changed images
-  - build all images
-  - mirroring
+  - build-images
+  - mirror-images
 
-build-changed-image:
-  stage: build changed images
-  script:
-
-    - |
-      # figure out changes
-      topdirlist=$(git diff --name-only $(git rev-parse HEAD~1) $(git rev-parse HEAD) | sed -e "s|/.*||g" | sort -u)
-      echo "top level directory candidates with changed files: $topdirlist"
-      
-      # on master branch, we also trigger publishing the image
-      if [ $CI_COMMIT_REF_NAME == 'master' ]; then
-        export PUSH_TO_REPOSITORY=$CI_DOCKER_REPOSITORY_PUBLISH
-      fi
-
-      # try to build all changed top level directories
-      ./build_and_push.sh $topdirlist
-
-build-all-images:
-  stage: build all images
-  when: manual
-  script:
-    - |
-      # on master branch, we also trigger publishing the image
-      if [ $CI_COMMIT_REF_NAME == 'master' ]; then
-        export PUSH_TO_REPOSITORY=$CI_DOCKER_REPOSITORY_PUBLISH
-      fi
-
-      # build all nb-directories
-      ./build_and_push.sh nb-*
-
-mirroring:
-  stage: mirroring
-  image: python:3.8
-  variables:
-    GITHUB_MIRROR: git@github.com:CSCfi/notebooks-public-images.git
-  script:
-    - mkdir mirror_dir
-    - cd mirror_dir
-    - echo "cloning the gitlab.ci repo"
-    - git clone $CI_REPOSITORY_URL notebooks-public-images
-    - cd notebooks-public-images
-    - echo "pushing to github repo"
-    - git checkout master
-    - mkdir ~/.ssh
-    - echo -e "Host github.com\n    StrictHostKeyChecking no\n" >> ~/.ssh/config
-    - eval `ssh-agent -s`
-    - ssh-agent bash -c 'ssh-add /root/ssh/notebooks-public-images-key/id_rsa; git push $GITHUB_MIRROR master'
+# We make use of all builds being identical. The build target is defined by COMPONENT in job variables.
+.job_template: &job_definition
+  stage: build-images
+  tags: ['noppe-images']
+  image: quay.io/buildah/stable:v1.36
+  timeout: 2h
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    # build only images that have been modified
+    - if: $CI_COMMIT_BRANCH
+      changes:
+        compare_to: 'refs/heads/main'
+        paths:
+          - "$COMPONENT/**/*"
+    # build all images if desired
+    - if: $BUILD_ALL_IMAGES == 'true'
+    - if: $BUILD_SINGLE_IMAGE == $COMPONENT
+  # Setup buildah cache for all jobs
+  before_script:
+    - |
+      cat > /etc/containers/registries.conf.d/cache.conf <<EOF
+      [[registry]]
+      location = "private-registry:5000"
+      insecure = true
+      EOF
+  script:
+    - echo "building ${COMPONENT}"
+    - cd "${CI_PROJECT_DIR}/${COMPONENT}"
+    - buildah build
+      --jobs 4
+      --layers --cache-from private-registry:5000/pebbles/cache --cache-to private-registry:5000/pebbles/cache 
+      --tag "${CI_IMAGE_REPO_CI}/${COMPONENT}:${CI_COMMIT_REF_NAME}"
+    - buildah push 
+      "${CI_IMAGE_REPO_CI}/${COMPONENT}:${CI_COMMIT_REF_NAME}"
+
+build-jupyter-datascience-image:
+  variables:
+    COMPONENT: jupyter-datascience
+  <<: *job_definition
+
+build-jupyter-machine-learning-image:
+  variables:
+    COMPONENT: jupyter-machine-learning
+  <<: *job_definition
+
+build-jupyter-minimal-image:
+  variables:
+    COMPONENT: jupyter-minimal
+  <<: *job_definition
+
+build-jupyter-pyspark-image:
+  variables:
+    COMPONENT: jupyter-pyspark
+  <<: *job_definition
+
+build-rstudio-geospatial-image:
+  variables:
+    COMPONENT: rstudio-geospatial
+  <<: *job_definition
+
+build-rstudio-microbiome-image:
+  variables:
+    COMPONENT: rstudio-microbiome
+  <<: *job_definition
+
+build-rstudio-ngs-image:
+  variables:
+    COMPONENT: rstudio-ngs
+    KUBERNETES_MEMORY_REQUEST: "4Gi"
+    KUBERNETES_MEMORY_LIMIT: "4Gi"
+  <<: *job_definition
+
+build-rstudio-scrna-image:
+  variables:
+    COMPONENT: rstudio-scrna
+  <<: *job_definition
+
+build-rstudio-teaching-image:
+  variables:
+    COMPONENT: rstudio-teaching
+  <<: *job_definition
+
+mirror-changed-images:
+  stage: mirror-images
+  tags: ['noppe-images']
+  image: $CI_IMAGE_REPO_CI/pebbles-deployer:main
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'main'
+  script:
+    - AUTH_CI=/run/secrets/runner-job-secrets/docker_config_ci.json
+    - AUTH_PUBLIC_IMAGES=/run/secrets/runner-job-secrets/docker_config_public_images.json
+    - IMAGES_TO_COPY="$(ls -d jupyter-* rstudio-*)"
+    - TAGS_TO_COPY="main"
+    - DATESTR=$(date +%Y-%m-%d_%H%M)
+    - |
+      for image in $IMAGES_TO_COPY; do
+        for tag in $TAGS_TO_COPY; do
+          echo
+          echo "Copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC_IMAGES"
+          echo
+          echo "...checking if the image digest already exists"
+          srcDigest=$(skopeo inspect --authfile=$AUTH_CI docker://$CI_IMAGE_REPO_CI/$image:$tag | jq -r '.Digest')
+          if skopeo inspect docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image@$srcDigest > /dev/null; then
+            echo "...digest $srcDigest already exists in $CI_IMAGE_REPO_PUBLIC_IMAGES"
+          else
+            skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
+              docker://$CI_IMAGE_REPO_CI/$image:$tag \
+              docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$tag
+
+            dateTag="$tag-$DATESTR"
+            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC/$image:$dateTag"
+            skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
+              docker://$CI_IMAGE_REPO_CI/$image:$tag \
+              docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$dateTag
+          fi
+        done
+      done

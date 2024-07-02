@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## script adapted from rockers install_geospatial but with own R package choices
+## script adapted from rocker's install_geospatial but with own R package choices
 
 set -e
 
