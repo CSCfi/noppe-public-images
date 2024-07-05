@@ -16,6 +16,7 @@ RUN echo "g++ from apt" \
     && apt-get install -y g++ \
     && apt-get clean
 
+# disable announcement extension to get rid of newsletter subscription pop-up
 RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
 
 # Switch back to jovyan user
