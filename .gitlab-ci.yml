@@ -44,7 +44,7 @@ stages:
         paths:
           - "$COMPONENT/**/*"
     # merge to main: build changed images compared to the previous commit
-    - if: ($CI_COMMIT_REF_NAME == 'main' && $CI_PIPELINE_SOURCE == "merge_request_event")
+    - if: ($CI_COMMIT_REF_NAME == 'main' && $CI_PIPELINE_SOURCE == "push")
       changes:
         paths:
           - "$COMPONENT/**/*"
