@@ -37,14 +37,20 @@ stages:
   image: quay.io/buildah/stable:v1.36
   timeout: 2h
   rules:
-    # build only images that have been modified
+    # feature branch: build only images that have been modified
     - if: $CI_COMMIT_BRANCH
       changes:
         compare_to: 'refs/heads/main'
         paths:
           - "$COMPONENT/**/*"
-    # build all images if desired
+    # merge to main: build changed images compared to the previous commit
+    - if: ($CI_COMMIT_REF_NAME == 'main' && $CI_PIPELINE_SOURCE == "merge_request_event")
+      changes:
+        paths:
+          - "$COMPONENT/**/*"
+    # pipeline UI: build all images if desired
     - if: $BUILD_ALL_IMAGES == 'true'
+    # pipeline UI: build a single image
     - if: $BUILD_SINGLE_IMAGE == $COMPONENT
   # Setup buildah cache for all jobs
   before_script:
