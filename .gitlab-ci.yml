@@ -162,7 +162,7 @@ mirror-changed-images:
             echo "...digest $srcDigest already exists in $CI_IMAGE_REPO_PUBLIC_IMAGES"
             digestExists=1
           fi
-          if [[ ! $digestExists || $TAG_ALL_IMAGES == 'true' || $TAG_SINGLE_IMAGE == $image ]]; then
+          if [[ $digestExists -eq 0 || $TAG_ALL_IMAGES == 'true' || $TAG_SINGLE_IMAGE == $image ]]; then
             echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC/$image:$tag"
             skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
               docker://$CI_IMAGE_REPO_CI/$image:$tag \
