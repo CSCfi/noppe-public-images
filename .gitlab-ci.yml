@@ -140,6 +140,7 @@ mirror-changed-images:
           if skopeo inspect docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image@$srcDigest > /dev/null; then
             echo "...digest $srcDigest already exists in $CI_IMAGE_REPO_PUBLIC_IMAGES"
           else
+            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC/$image:$tag"
             skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
               docker://$CI_IMAGE_REPO_CI/$image:$tag \
               docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$tag
@@ -149,6 +150,12 @@ mirror-changed-images:
             skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
               docker://$CI_IMAGE_REPO_CI/$image:$tag \
               docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$dateTag
+
+            shortTag="$(date +%Y-%m-%d)"
+            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC/$image:$shortTag"
+            skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
+              docker://$CI_IMAGE_REPO_CI/$image:$tag \
+              docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$shortTag
           fi
         done
       done
