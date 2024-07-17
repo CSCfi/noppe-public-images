@@ -25,6 +25,26 @@ variables:
       - rstudio-ngs
       - rstudio-scrna
       - rstudio-teaching
+  TAG_ALL_IMAGES:
+    description: 'Force creating a new tag for all images regardless of changes'
+    value: 'false'
+    options:
+      - 'false'
+      - 'true'
+  TAG_SINGLE_IMAGE:
+    description: 'Force creating a new tag for a single image regardless of changes'
+    value: ''
+    options:
+      - ''
+      - jupyter-datascience
+      - jupyter-machine-learning
+      - jupyter-minimal
+      - jupyter-pyspark
+      - rstudio-geospatial
+      - rstudio-microbiome
+      - rstudio-ngs
+      - rstudio-scrna
+      - rstudio-teaching
 
 stages:
   - build-images
@@ -137,9 +157,12 @@ mirror-changed-images:
           echo
           echo "...checking if the image digest already exists"
           srcDigest=$(skopeo inspect --authfile=$AUTH_CI docker://$CI_IMAGE_REPO_CI/$image:$tag | jq -r '.Digest')
+          digestExists=0
           if skopeo inspect docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image@$srcDigest > /dev/null; then
             echo "...digest $srcDigest already exists in $CI_IMAGE_REPO_PUBLIC_IMAGES"
-          else
+            digestExists=1
+          fi
+          if [[ ! $digestExists || $TAG_ALL_IMAGES == 'true' || $TAG_SINGLE_IMAGE == $image ]]; then
             echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC/$image:$tag"
             skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
               docker://$CI_IMAGE_REPO_CI/$image:$tag \
