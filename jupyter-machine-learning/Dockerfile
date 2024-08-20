@@ -61,5 +61,8 @@ RUN echo "pydot and pydot-ng" \
     && pip --no-cache-dir install pydot pydot-ng\
     && true
 
+RUN echo "transformers and datasets" \
+    && pip --no-cache-dir install transformers datasets
+
 # disable announcement extension to get rid of newsletter subscription pop-up
 RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
