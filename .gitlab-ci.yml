@@ -163,19 +163,19 @@ mirror-changed-images:
             digestExists=1
           fi
           if [[ $digestExists -eq 0 || $TAG_ALL_IMAGES == 'true' || $TAG_SINGLE_IMAGE == $image ]]; then
-            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC/$image:$tag"
+            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$tag"
             skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
               docker://$CI_IMAGE_REPO_CI/$image:$tag \
               docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$tag
 
             dateTag="$tag-$DATESTR"
-            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC/$image:$dateTag"
+            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$dateTag"
             skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
               docker://$CI_IMAGE_REPO_CI/$image:$tag \
               docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$dateTag
 
             shortTag="$(date +%Y-%m-%d)"
-            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC/$image:$shortTag"
+            echo "...copying $CI_IMAGE_REPO_CI/$image:$tag to $CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$shortTag"
             skopeo copy --preserve-digests --src-authfile=$AUTH_CI --dest-authfile=$AUTH_PUBLIC_IMAGES \
               docker://$CI_IMAGE_REPO_CI/$image:$tag \
               docker://$CI_IMAGE_REPO_PUBLIC_IMAGES/$image:$shortTag
