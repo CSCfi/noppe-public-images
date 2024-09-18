@@ -1,6 +1,6 @@
 FROM quay.io/jupyter/minimal-notebook:notebook-7.1.3
 
-LABEL org.opencontainers.image.authors="Noppe Team <notebooks-admin@csc.fi>"
+LABEL org.opencontainers.image.authors="Noppe Team <noppe-admin@csc.fi>"
 
 USER root
 
