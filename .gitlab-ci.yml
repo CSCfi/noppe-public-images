@@ -16,6 +16,7 @@ variables:
     value: ''
     options:
       - ''
+      - jupyter-aitta-llm
       - jupyter-datascience
       - jupyter-geospatial
       - jupyter-machine-learning
@@ -37,6 +38,7 @@ variables:
     value: ''
     options:
       - ''
+      - jupyter-aitta-llm
       - jupyter-datascience
       - jupyter-geospatial
       - jupyter-machine-learning
@@ -91,6 +93,13 @@ stages:
       --tag "${CI_IMAGE_REPO_CI}/${COMPONENT}:${CI_COMMIT_REF_NAME}"
     - buildah push 
       "${CI_IMAGE_REPO_CI}/${COMPONENT}:${CI_COMMIT_REF_NAME}"
+
+build-jupyter-aitta-llm-image:
+  variables:
+    COMPONENT: jupyter-aitta-llm
+    KUBERNETES_MEMORY_REQUEST: "4Gi"
+    KUBERNETES_MEMORY_LIMIT: "4Gi"
+  <<: *job_definition
 
 build-jupyter-datascience-image:
   variables:
