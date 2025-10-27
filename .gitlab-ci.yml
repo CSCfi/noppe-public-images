@@ -24,6 +24,7 @@ variables:
       - jupyter-pyspark
       - rstudio-geospatial
       - rstudio-microbiome
+      - rstudio-minimal
       - rstudio-ngs
       - rstudio-scrna
       - rstudio-teaching
@@ -46,6 +47,7 @@ variables:
       - jupyter-pyspark
       - rstudio-geospatial
       - rstudio-microbiome
+      - rstudio-minimal
       - rstudio-ngs
       - rstudio-scrna
       - rstudio-teaching
@@ -136,6 +138,11 @@ build-rstudio-geospatial-image:
 build-rstudio-microbiome-image:
   variables:
     COMPONENT: rstudio-microbiome
+  <<: *job_definition
+
+build-rstudio-minimal-image:
+  variables:
+    COMPONENT: rstudio-minimal
   <<: *job_definition
 
 build-rstudio-ngs-image:
