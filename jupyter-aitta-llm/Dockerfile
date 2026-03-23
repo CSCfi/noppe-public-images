@@ -39,7 +39,7 @@ RUN echo "transformers" \
     && pip --no-cache-dir install transformers==4.55.4
 
 RUN echo "aitta-client" \
-    && pip --no-cache-dir install aitta-client==0.2.2
+    && pip --no-cache-dir install aitta-client==0.3.3
 
 RUN echo "faiss-cpu" \
     && pip --no-cache-dir install faiss-cpu==1.12.0
