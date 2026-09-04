@@ -44,11 +44,11 @@ apt-get update -qq \
     gdebi-core
 
 echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh
-wget https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh  -O ~/anaconda.sh
-/bin/bash ~/anaconda.sh -b -p /opt/conda
-rm ~/anaconda.sh
+wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O ~/miniforge.sh
+/bin/bash ~/miniforge.sh -b -p /opt/conda
+rm ~/miniforge.sh
 export PATH=$PATH:/opt/conda/bin
-conda install -c conda-forge tbb
+conda install -y -c conda-forge tbb
 
 ## Somehow foreign is messed up on CRAN between 2020-04-25 -- 2020-05-0?
 ##install2.r --error --skipinstalled --repo https://mran.microsoft.com/snapshot/2020-04-24 foreign

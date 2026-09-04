@@ -1,4 +1,4 @@
-FROM docker.io/rocker/rstudio:4.3.1
+FROM docker.io/rocker/rstudio:4.5.1
 
 ENV PATH=/usr/lib/rstudio-server/bin:$PATH
 
