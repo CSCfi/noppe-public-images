@@ -22,6 +22,7 @@ variables:
       - jupyter-machine-learning
       - jupyter-minimal
       - jupyter-pyspark
+      - linux-cli
       - rstudio-geospatial
       - rstudio-microbiome
       - rstudio-minimal
@@ -45,6 +46,7 @@ variables:
       - jupyter-machine-learning
       - jupyter-minimal
       - jupyter-pyspark
+      - linux-cli
       - rstudio-geospatial
       - rstudio-microbiome
       - rstudio-minimal
@@ -128,6 +130,11 @@ build-jupyter-minimal-image:
 build-jupyter-pyspark-image:
   variables:
     COMPONENT: jupyter-pyspark
+  <<: *job_definition
+
+build-linux-cli-image:
+  variables:
+    COMPONENT: linux-cli
   <<: *job_definition
 
 build-rstudio-geospatial-image:

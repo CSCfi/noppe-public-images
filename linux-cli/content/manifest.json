@@ -1,0 +1,16 @@
+{
+	"title": "Placeholder",
+	"topics": [
+		{
+			"id": "instructions",
+			"title": "Instructions",
+			"chapters": [
+				{
+					"id": "get-started",
+					"title": "Get started",
+					"file": "get-started.md"
+				}
+			]
+		}
+	]
+}

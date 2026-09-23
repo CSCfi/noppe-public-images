@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noppe CLI Learning Environment</title>
+
+    <script>
+        (function () {
+            // Drop a trailing page name, so /index.html gives a base of / and
+            // not /index.html/. Anything without an .htm(l) suffix is a
+            // directory, which the server would have redirected to end in /.
+            var basePath = window.location.pathname.replace(/\/[^/]*\.html?$/i, '/');
+            if (!basePath.endsWith('/')) basePath += '/';
+            document.write('<base href="' + basePath + '">');
+        })();
+    </script>
+
+    <link rel="stylesheet" href="css/vendor/highlight-github.min.css">
+
+    <!-- Application -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="content-panel" id="content-panel">
+            <div class="nav-header">
+                <div class="search-box" id="search-box">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="search-input" class="search-input" placeholder="Search all courses…" autocomplete="off" spellcheck="false" aria-label="Search course content">
+                    <button type="button" class="search-close" id="search-close-btn" title="Close search" aria-label="Close search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                    <div class="search-results" id="search-results" role="listbox" hidden></div>
+                </div>
+                <select id="topic-selector" onchange="ContentNav.selectTopic(this.value)" disabled>
+                    <option value="">Select Topic...</option>
+                </select>
+                <button id="prev-btn" onclick="ContentNav.prev()" title="Previous chapter" aria-label="Previous chapter" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <select id="page-selector" onchange="ContentNav.goTo(this.value)" disabled></select>
+                <button id="next-btn" onclick="ContentNav.next()" title="Next chapter" aria-label="Next chapter" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+                <button id="search-toggle-btn" onclick="Search.open()" title="Search (Ctrl+K)" aria-label="Search course content">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
+                <button id="toggle-terminal-btn" onclick="TerminalPanel.toggle()" title="Toggle Terminal" aria-label="Toggle terminal">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><polyline points="7 9 10 12 7 15"/><line x1="13" y1="15" x2="17" y2="15"/></svg>
+                </button>
+                <button id="open-terminal-btn" onclick="TerminalPanel.openNewWindow()" title="Open Terminal in New Window" aria-label="Open terminal in new window">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </button>
+            </div>
+
+            <div class="markdown-content" id="markdown-content">
+                <div class="loading">Loading content...</div>
+            </div>
+        </div>
+
+        <div class="panel-resizer" id="panel-resizer"></div>
+
+        <div class="terminal-panel" id="terminal-panel">
+            <iframe id="terminal-iframe" src="tty/"></iframe>
+        </div>
+
+    </div>
+
+    <script src="js/vendor/markdown-it.min.js"></script>
+    <script src="js/vendor/markdown-it-container.min.js"></script>
+    <script src="js/vendor/highlight.min.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/terminal.js"></script>
+</body>
+</html>
