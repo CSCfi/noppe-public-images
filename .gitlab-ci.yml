@@ -178,7 +178,7 @@ mirror-changed-images:
   script:
     - AUTH_CI=/run/secrets/runner-job-secrets/docker_config_ci.json
     - AUTH_PUBLIC_IMAGES=/run/secrets/runner-job-secrets/docker_config_public_images.json
-    - IMAGES_TO_COPY="$(ls -d jupyter-* rstudio-*)"
+    - IMAGES_TO_COPY="$(ls -d jupyter-* rstudio-* linux-cli)"
     - TAGS_TO_COPY="main"
     - DATESTR=$(date +%Y-%m-%d_%H%M)
     - |
