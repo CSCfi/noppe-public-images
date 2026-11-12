@@ -85,5 +85,5 @@ until service munge status >/dev/null 2>&1; do sleep 0.2; done
 slurmd
 slurmctld
 
-# Start Caddy
-exec caddy run --config /etc/caddy/Caddyfile
+# Start Caddy as unprivileged user
+HOME="/home/$USERNAME" exec setpriv --reuid="$USERNAME" --regid="$USERNAME" --init-groups --inh-caps=-all caddy run --config /etc/caddy/Caddyfile

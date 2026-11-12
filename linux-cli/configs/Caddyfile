@@ -1,3 +1,6 @@
+{
+    admin off
+}
 :8787 {
     # Serve static files from /app
     root * /app

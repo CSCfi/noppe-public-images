@@ -1,2 +1,4 @@
 # Local scratch, never part of the image
 .content-scratch/
+
+dev-run.sh
