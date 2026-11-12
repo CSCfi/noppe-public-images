@@ -19,6 +19,8 @@ COPY ./html/ /app/
 COPY ./configs/Caddyfile /etc/caddy/Caddyfile
 COPY ./content/ /app/content
 
+RUN chmod 644 /etc/caddy/Caddyfile && chmod -R a+rX /app
+
 COPY ./LICENSE        /usr/share/licenses/LICENSE
 COPY ./licenses/      /usr/share/licenses/
 
