@@ -85,5 +85,8 @@ until service munge status >/dev/null 2>&1; do sleep 0.2; done
 slurmd
 slurmctld
 
-# Start Caddy as unprivileged user
-HOME="/home/$USERNAME" exec setpriv --reuid="$USERNAME" --regid="$USERNAME" --init-groups --inh-caps=-all caddy run --config /etc/caddy/Caddyfile
+# Caddy runs as the session user, who can then read its environment: reset it.
+# XDG_DATA_HOME (Caddy appends caddy/) keeps its state out of the home volume.
+exec setpriv --reuid="$USERNAME" --regid="$USERNAME" --init-groups \
+    --bounding-set=-all --inh-caps=-all --reset-env \
+    env XDG_DATA_HOME=/var/lib caddy run --config /etc/caddy/Caddyfile

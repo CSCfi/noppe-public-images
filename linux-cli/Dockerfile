@@ -1,4 +1,6 @@
 FROM docker.io/library/caddy:2.8-alpine AS caddy
+# The empty bounding set in start.sh cannot exec a file-capability binary.
+RUN setcap -r /usr/bin/caddy
 
 FROM docker.io/library/ubuntu:24.04
 
@@ -19,7 +21,8 @@ COPY ./html/ /app/
 COPY ./configs/Caddyfile /etc/caddy/Caddyfile
 COPY ./content/ /app/content
 
-RUN chmod 644 /etc/caddy/Caddyfile && chmod -R a+rX /app
+RUN chmod 644 /etc/caddy/Caddyfile && chmod -R a+rX /app \
+    && install -d -o "$USERNAME" -g "$USERNAME" /var/lib/caddy
 
 COPY ./LICENSE        /usr/share/licenses/LICENSE
 COPY ./licenses/      /usr/share/licenses/
